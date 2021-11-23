@@ -2,6 +2,7 @@ version: 2.1
 
 jobs:
   build-docker-test-image:
+    working_directory: /app
     docker:
       - image: cimg/node:16.10
     steps:
@@ -9,60 +10,7 @@ jobs:
           name: Building Docker test image
           command: docker build -t omarsafwany/react-test -f ./client/Dockerfile.dev ./client
 
-  coverage:
-    docker:
-      - image: cimg/node:16.10
-    steps:
-      - run:
-          name: Run coverage
-          command: docker run -e CI=true omarsafwany/react-test npm run test -- --coverage
-
-  build-docker-prod-images:
-    docker:
-      - image: cimg/node:16.10
-    steps:
-      - run:
-          name: Build multi-client
-          command: docker build -t omarsafwany/multi-client ./client
-      - run:
-          name: Build multi-nginx
-          command: docker build -t omarsafwany/multi-nginx ./nginx
-      - run:
-          name: Build multi-server
-          command: docker build -t omarsafwany/multi-server ./server
-      - run:
-          name: Build multi-worker
-          command: docker build -t omarsafwany/multi-worker ./worker
-
-  docker-login:
-    docker:
-      - image: cimg/node:16.10
-    steps:
-      - run:
-          name: Docker Login
-          command: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
-
-  push-docker-prod-images:
-    docker:
-      - image: cimg/node:16.10
-    steps:
-      - run:
-          name: Push multi-client
-          command: docker push omarsafwany/multi-client
-      - run:
-          name: Push multi-nginx
-          command: docker push omarsafwany/multi-nginx
-      - run:
-          name: Push multi-server
-          command: docker push omarsafwany/multi-server
-      - run:
-          name: Push multi-worker
-          command: docker push omarsafwany/multi-worker
 workflows:
   sample:
     jobs:
       - build-docker-test-image
-      - coverage
-      - build-docker-prod-images
-      - docker-login
-      - push-docker-prod-images
