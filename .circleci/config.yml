@@ -2,7 +2,7 @@ version: 2.1
 
 jobs:
   build-docker-test-image:
-    working_directory: /app
+    working_directory: /home/circleci
     docker:
       - image: cimg/node:16.10
     steps:
